@@ -1,0 +1,31 @@
+services:
+  back:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    ports:
+      ["1313:1313","1331:1331"]
+    environment:
+      ASPNET_CREDENTIAL_FILE_DEFAULT : "./aspnetapp.pfx"
+      ASPNET_CREDENTIAL_FILE_PASSWORD : "wyrmxqcwxrQUNfekEHFYFFrwNYnCLw"
+      CONNECTION_STRING : "User id=user;Password=pwd131313;Host=database;Port=5432;Database=instance;"
+      API_URL : "https://dolarapi.com/v1/dolares"
+
+  database:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_DB: instance
+      POSTGRES_PASSWORD : pwd131313
+    expose:
+      - 1413
+    ports:
+      - 5432:1413
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 591:8080
+    depends_on :
+      - database
