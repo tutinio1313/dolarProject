@@ -28,7 +28,7 @@ builder.Services.AddDbContext<ContainerDbContext>(
 );
 
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IApiWorker, ApiWorker>();
+builder.Services.AddScoped<IApiService, ApiService>();
 
 
 builder.Services.AddHttpsRedirection(options =>
@@ -61,7 +61,7 @@ app.UseRouting();
 app.MapControllers();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-app.MapGet("/dolar", async (IApiWorker api) =>
+app.MapGet("/dolar", async (IApiService api) =>
 {
     Exchange[] result = await api.PingAPI();
     if(result != null)
