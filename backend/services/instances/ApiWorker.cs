@@ -15,29 +15,25 @@ public class ApiWorker(ILogger<ApiWorker> logger, IApiService apiService, ICurre
             {
                 logger.LogInformation($"Started {DateTime.UtcNow.ToLongDateString}");
                 try
-                {
+                {                   
+                    Exchange[] ApiResponse = await apiService.PingAPI();
 
-                    while (!stoppingToken.IsCancellationRequested)
+                    if (!Equals(ApiResponse, null))
                     {
-                        Exchange[] ApiResponse = await apiService.PingAPI();
-
-                        if (!Equals(ApiResponse, null))
+                        for(int index = 0; index < ApiResponse.Length; index++)
                         {
-                            for(int index = 0; index < ApiResponse.Length; index++)
-                            {
-                                ApiResponse[index].ID = Guid.NewGuid().ToString();
-                            }
-
-                            logger.LogInformation("Data was retrieved from Dolar API.");
-                            await currencyRepository.AddRangeAsync(ApiResponse);
-                            logger.LogInformation("Data was stored succesfully.");
-
+                            ApiResponse[index].ID = Guid.NewGuid().ToString();
                         }
-                        else
-                        {
-                            logger.LogWarning("There is no data retrieved from API Service.");
-                        }
+
+                        logger.LogInformation("Data was retrieved from Dolar API.");
+                        await currencyRepository.AddRangeAsync(ApiResponse);
+                        logger.LogInformation("Data was stored succesfully.");
                     }
+                    else
+                    {
+                        logger.LogWarning("There is no data retrieved from API Service.");
+                    }
+                
 
                 }
                 catch (Exception ex)
