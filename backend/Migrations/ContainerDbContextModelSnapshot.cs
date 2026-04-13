@@ -22,15 +22,19 @@ namespace backend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("backend.model.Exchange", b =>
+            modelBuilder.Entity("common.model.Exchange", b =>
                 {
-                    b.Property<string>("ExchangeID")
-                        .HasColumnType("text")
-                        .HasJsonPropertyName("moneda");
+                    b.Property<string>("ID")
+                        .HasColumnType("text");
 
                     b.Property<float>("Buy")
                         .HasColumnType("real")
                         .HasJsonPropertyName("compra");
+
+                    b.Property<string>("ExchangeID")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasJsonPropertyName("moneda");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -50,7 +54,7 @@ namespace backend.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasJsonPropertyName("fechaActualizacion");
 
-                    b.HasKey("ExchangeID");
+                    b.HasKey("ID");
 
                     b.ToTable("exchanges");
                 });

@@ -23,6 +23,11 @@ public class ApiWorker(ILogger<ApiWorker> logger, IApiService apiService, ICurre
 
                         if (!Equals(ApiResponse, null))
                         {
+                            for(int index = 0; index < ApiResponse.Length; index++)
+                            {
+                                ApiResponse[index].ID = Guid.NewGuid().ToString();
+                            }
+
                             logger.LogInformation("Data was retrieved from Dolar API.");
                             await currencyRepository.AddRangeAsync(ApiResponse);
                             logger.LogInformation("Data was stored succesfully.");
@@ -73,8 +78,23 @@ public class ApiWorker(ILogger<ApiWorker> logger, IApiService apiService, ICurre
         }
         else
         {
-            TimeOut = 15 * 60 * 1_000;
-            return true;
+            if(today.Hour < 8)
+            {
+                TimeOut = (((8-today.Hour)*3_600 )+ (60 - today.Minute * 60))*1_000;
+            }
+
+            else if(today.Hour > 18)
+            {
+                TimeOut = (((32-today.Hour)*3_600 )+ (60 - today.Minute * 60))*1_000;
+            }
+
+            else 
+            {
+                TimeOut = 15 * 60 * 1_000;
+            }
         }
+
+        TimeOut = 3_600 * 1_000;
+        return true;
     }
 }

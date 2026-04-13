@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(int.Parse(builder.Configuration["http_port"]!));
@@ -53,11 +54,15 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
+await ApplyMigration.Apply(app);
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
 
 app.UseHttpsRedirection();
 app.UseHsts();

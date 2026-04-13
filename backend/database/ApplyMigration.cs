@@ -10,6 +10,7 @@ public static class ApplyMigration
     //private static readonly ILogger<ApplyMigration> logger;
     public static async Task Apply(IApplicationBuilder app)
     {
+
         ContainerDbContext context = CreateContext(app);
 
         Console.WriteLine("Applying migration.");
