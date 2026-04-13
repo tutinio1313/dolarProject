@@ -1,11 +1,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
-WORKDIR /App/
-COPY "." "."
-RUN dotnet restore "backend.csproj"
+WORKDIR /App
+
+COPY "backend/" "backend/"
+COPY "common/" "common/"
+RUN dotnet restore "/App/backend/backend.csproj"
 
 WORKDIR /App/
-RUN dotnet publish -o /Out
+RUN dotnet publish "/App/backend/backend.csproj" -o /Out
 
 WORKDIR /Out
 RUN dotnet dev-certs https -ep ./aspnetapp.pfx -p wyrmxqcwxrQUNfekEHFYFFrwNYnCLw

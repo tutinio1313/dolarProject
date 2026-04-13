@@ -1,8 +1,8 @@
 services:
   back:
     build:
-      context: ./backend
-      dockerfile: dockerfile
+      context: ./
+      dockerfile: ./backend/dockerfile
     ports:
       ["1313:1313","1331:1331"]
     environment:
