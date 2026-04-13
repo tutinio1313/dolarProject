@@ -1,4 +1,4 @@
-using backend.model;
+using common.model;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.database;

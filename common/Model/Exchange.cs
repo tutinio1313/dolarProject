@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
-using backend.database.repository;
 
-namespace backend.model;
+namespace common.model;
 public class Exchange
 {
     [JsonPropertyName("moneda")]

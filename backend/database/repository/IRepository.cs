@@ -6,7 +6,8 @@ namespace backend.database.repository;
 public interface IRepository<T>
 {
     public Task<bool> AddAsync(T entity);
+    public Task<bool> AddInRangeAsync(IEnumerable<T> entity);
     public Task<bool> RemoveAsync(T entity);
-    public IQueryable<T> Get(Expression<Func<T,bool>>? filter, bool tracked = false);
+    public IQueryable<T> Get(Expression<Func<T,bool>>? filter, int page, int amount, bool tracked = false);
     public Task<int> CountAsync();
 }

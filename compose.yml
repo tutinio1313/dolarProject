@@ -10,6 +10,7 @@ services:
       ASPNET_CREDENTIAL_FILE_PASSWORD : "wyrmxqcwxrQUNfekEHFYFFrwNYnCLw"
       CONNECTION_STRING : "User id=user;Password=pwd131313;Host=database;Port=5432;Database=instance;"
       API_URL : "https://dolarapi.com/v1/dolares"
+      HISTORIC_USD_API_URL : "https://api.argentinadatos.com/v1/cotizaciones/dolares/"
 
   database:
     image: postgres:18

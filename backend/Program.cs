@@ -1,8 +1,9 @@
 using System.Net;
 using System.Text.Json;
 using backend.database;
+using backend.database.repository.currency;
 using backend.Middleware;
-using backend.model;
+using common.model;
 using backend.services.instances;
 using backend.services.interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,9 @@ builder.Services.AddDbContext<ContainerDbContext>(
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IApiService, ApiService>();
+builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+
+builder.Services.AddHostedService<ApiWorker>();
 
 
 builder.Services.AddHttpsRedirection(options =>
@@ -61,15 +65,7 @@ app.UseRouting();
 app.MapControllers();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-app.MapGet("/dolar", async (IApiService api) =>
-{
-    Exchange[] result = await api.PingAPI();
-    if(result != null)
-    {
-        return result;
-    }
-    return [];    
-})
+app.MapGet("/dolar", async (ICurrencyRepository repo, IApiService apiService) => await repo.GetLatest())
 .WithName("Dolar");
 
 app.MapGet("/ping", async () =>
