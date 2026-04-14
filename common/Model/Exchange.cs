@@ -17,3 +17,17 @@ public class Exchange
     [JsonPropertyName("fechaActualizacion")]
     public required DateTime UpdateTime {get;set;}
 }
+
+public class HistoricExchange
+{
+    public string? ID {get;set;}
+    [JsonPropertyName("casa")]
+    public string? Type {get;set;}
+    [JsonPropertyName("compra")]
+    public float? Buy {get;set;}
+    [JsonPropertyName("venta")]
+    public float? Sell {get;set;}
+    [JsonPropertyName("fecha")]
+    public DateOnly? UpdateTime {get;set;}
+
+}

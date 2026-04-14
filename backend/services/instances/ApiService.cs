@@ -6,8 +6,7 @@ namespace backend.services.instances;
 public class ApiService(HttpClient client, ILogger<ApiService> logger, IConfiguration configuration) : IApiService
 {
     public async Task<Exchange[]> PingAPI()
-    {    
-
+    { 
         try
         {
             Exchange[]? result = await client.GetFromJsonAsync<Exchange[]>(configuration["API_URL"]!);
@@ -24,8 +23,21 @@ public class ApiService(HttpClient client, ILogger<ApiService> logger, IConfigur
         return [];
     }
 
-    public Task<Exchange[]> PingAPIHistorical()
+    public async Task<HistoricExchange[]> PingAPIHistorical()
     {
-        throw new NotImplementedException();
+          try
+        {
+            HistoricExchange[]? result = await client.GetFromJsonAsync<HistoricExchange[]>(configuration["HISTORIC_USD_API_URL"]!);
+            
+            if(result != null && result.Length > 0)
+            {
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);            
+        }
+        return [];
     }
 }

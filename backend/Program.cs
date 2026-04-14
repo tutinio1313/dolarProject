@@ -55,6 +55,11 @@ builder.Logging.AddConsole();
 var app = builder.Build();
 
 await ApplyMigration.Apply(app);
+await ApplyMigration.PopulateData(
+    builder.Configuration, 
+app.Services.CreateScope().ServiceProvider.GetRequiredService<IApiService>(),
+app.Services.CreateScope().ServiceProvider.GetRequiredService<ICurrencyRepository>()
+);
 
 
 // Configure the HTTP request pipeline.
