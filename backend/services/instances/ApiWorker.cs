@@ -20,11 +20,6 @@ public class ApiWorker(ILogger<ApiWorker> logger, IApiService apiService, ICurre
 
                     if (!Equals(ApiResponse, null))
                     {
-                        for(int index = 0; index < ApiResponse.Length; index++)
-                        {
-                            ApiResponse[index].ID = Guid.NewGuid().ToString();
-                        }
-
                         logger.LogInformation("Data was retrieved from Dolar API.");
                         await currencyRepository.AddRangeAsync(ApiResponse);
                         logger.LogInformation("Data was stored succesfully.");
@@ -42,12 +37,9 @@ public class ApiWorker(ILogger<ApiWorker> logger, IApiService apiService, ICurre
                     throw;
                 }
             }
-            else
-            {
-                DateTime scheduledDate = DateTime.UtcNow.AddHours(-3).AddMilliseconds(TimeOut);
-                logger.LogInformation($"The worker is scheduled to run in ${scheduledDate.ToLongDateString}");
-            }
-
+            
+            DateTime scheduledDate = DateTime.UtcNow.AddHours(-3).AddMilliseconds(TimeOut);
+            logger.LogInformation($"The worker is scheduled to run in ${scheduledDate:yyyy:MM:dd:HH:mm:ss:z}");
             await Task.Delay(TimeOut, stoppingToken);
         }
 
@@ -88,9 +80,8 @@ public class ApiWorker(ILogger<ApiWorker> logger, IApiService apiService, ICurre
             {
                 TimeOut = 15 * 60 * 1_000;
             }
-        }
+            return true;
 
-        TimeOut = 3_600 * 1_000;
-        return true;
+        }
     }
 }

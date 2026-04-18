@@ -3,7 +3,11 @@ using System.Text.Json.Serialization;
 namespace common.model;
 public class Exchange
 {
-    public string ID {get;set;}
+    public Exchange()
+    {
+        ID = Guid.NewGuid().ToString();
+    }
+    public string ID {get;set;} 
     [JsonPropertyName("moneda")]
     public required string ExchangeID {get;set;}
     [JsonPropertyName("casa")]

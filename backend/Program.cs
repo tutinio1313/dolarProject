@@ -8,6 +8,11 @@ using backend.services.instances;
 using backend.services.interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
+using OpenTelemetry;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +34,8 @@ builder.Services.AddDbContext<ContainerDbContext>(
     }
 );
 
+
+
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
@@ -46,11 +53,34 @@ builder.Services.AddHttpsRedirection(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-builder.Services.AddLogging();
+//builder.Services.AddLogging();
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
 
+builder.Logging.AddOpenTelemetry( options =>
+{
+    options.IncludeFormattedMessage = true;
+    options.IncludeScopes = true;
+});
+
+var openTelemetry = builder.Services.AddOpenTelemetry()
+    .WithMetrics(
+    metrics =>
+    {
+        metrics.AddAspNetCoreInstrumentation();
+        metrics.AddMeter("Microsoft.AspNetCore.Hosting");
+        metrics.AddMeter("Microsoft.AspNetCore.Server.Kestrel");
+    }
+    ).WithTracing( tracer =>
+    {
+        tracer.AddAspNetCoreInstrumentation();
+        tracer.AddHttpClientInstrumentation();
+
+    });
+
+if(!string.IsNullOrEmpty(builder.Configuration["GRAFANA_IP"]))
+{
+    openTelemetry.UseOtlpExporter();
+}
 
 var app = builder.Build();
 

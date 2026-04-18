@@ -1,5 +1,5 @@
 services:
-  back:
+  backend:
     build:
       context: ./
       dockerfile: ./backend/dockerfile
@@ -18,10 +18,8 @@ services:
       POSTGRES_USER: user
       POSTGRES_DB: instance
       POSTGRES_PASSWORD : pwd131313
-    expose:
-      - 1413
     ports:
-      - 5432:1413
+      - "5432:5432"
 
   adminer:
     image: adminer
@@ -30,3 +28,10 @@ services:
       - 591:8080
     depends_on :
       - database
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./dockerfile
+    ports:
+      ["80:80","433:433"]
