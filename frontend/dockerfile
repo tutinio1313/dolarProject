@@ -1,0 +1,15 @@
+FROM node:lts as builder
+WORKDIR /App
+
+copy "frontend" "frontend"
+WORKDIR /App/frontend
+RUN ls
+RUN npm install
+RUN npm install -g @angular/cli
+RUN ng build --aot true --configuration production
+
+
+from nginx:latest
+COPY --from=builder App/frontend/dist/frontend-App/browser/ /usr/share/nginx/html
+EXPOSE 80
+EXPOSE 443

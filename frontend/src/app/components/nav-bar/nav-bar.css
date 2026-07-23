@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@media (prefers-color-scheme: dark) {
+  #navContainer {
+    background-color: var(--dark-alternative-background-color);
+  }
+}
+@media (prefers-color-scheme: light) {
+  #navContainer {
+    background-color: var(--dark-alternative-background-color);
+  }
+}

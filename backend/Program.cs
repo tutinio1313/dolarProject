@@ -40,9 +40,6 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 
-builder.Services.AddHostedService<ApiWorker>();
-
-
 builder.Services.AddHttpsRedirection(options =>
 {
     options.RedirectStatusCode = (int) HttpStatusCode.PermanentRedirect;

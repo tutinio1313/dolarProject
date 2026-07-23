@@ -8,19 +8,29 @@ services:
     environment:
       ASPNET_CREDENTIAL_FILE_DEFAULT : "./aspnetapp.pfx"
       ASPNET_CREDENTIAL_FILE_PASSWORD : "wyrmxqcwxrQUNfekEHFYFFrwNYnCLw"
-      CONNECTION_STRING : "User id=user;Password=pwd131313;Host=database;Port=5432;Database=instance;"
-      API_URL : "https://dolarapi.com/v1/dolares"
-      HISTORIC_USD_API_URL : "https://api.argentinadatos.com/v1/cotizaciones/dolares/"
+      CONNECTION_STRING : ${POSTGRESQL_CONNECTION_STRING}
+      API_URL : ${API_URL}
+      HISTORIC_USD_API_URL : ${HISTORICAL_API_URL}
 
   database:
     image: postgres:18
     environment:
-      POSTGRES_USER: user
-      POSTGRES_DB: instance
-      POSTGRES_PASSWORD : pwd131313
+      POSTGRES_USER: ${POSTGRESQL_USER}
+      POSTGRES_DB: ${POSTGRESQL_DATABASE}
+      POSTGRES_PASSWORD : ${POSTGRESQL_PASSWORD}
     ports:
       - "5432:5432"
-
+  
+  batchjobs:
+    build:
+      context: ./
+      dockerfile: ./worker/dockerfile
+    environment:
+      SQLConnectionString : ${POSTGRESQL_CONNECTION_STRING}
+      VALKEY_IP : ${VALKEY_IP}
+      VALKEY_PASSWORD : ${VALKEY_PASSWORD}
+      API_URL : ${API_URL}
+ 
   adminer:
     image: adminer
     restart: always
@@ -31,7 +41,40 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: ./dockerfile
+      context: ./
+      dockerfile: ./frontend/dockerfile
     ports:
       ["80:80","433:433"]
+
+  elasticsearch:
+    container_name: ElasticSeach
+    hostname: elastic1
+    image: docker.elastic.co/elasticsearch/elasticsearch-wolfi:${ES_VERSION}
+    restart: unless-stopped
+    expose:
+      - 9234
+    mem_limit: 1g
+    environment:
+      - cluster.name=Elastic1
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xlog:disable -Xlog:all=warning:stderr:utctime,level,tags -Xlog:gc=debug:stderr:utctime
+      - xpack.security.enabled=false
+
+  kibana:
+    container_name: KibanaDolar
+    hostname: kibana
+    image: docker.elastic.co/kibana/kibana-wolfi:${ES_VERSION}
+    ports:
+      - 9235:5601
+    mem_limit: 1g
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elastic1:9200
+      - TELEMETRY_OPTIN=false
+
+  valkey:
+    container_name: valkey
+    hostname: valkey
+    image: valkey/valkey:latest
+    command: valkey-server --port ${VALKEY_IP} --requirepass ${VALKEY_PASSWORD}
+    expose:
+      - ${VALKEY_IP}

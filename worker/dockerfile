@@ -1,0 +1,34 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+
+WORKDIR /App
+
+ARG API_URL
+ARG VALKEY_IP
+ARG VALKEY_PASSWORD
+ARG SQLConnectionString
+
+
+COPY "worker/" "worker/"
+COPY "common/" "common/"
+RUN dotnet restore "/App/worker/worker.csproj"
+
+WORKDIR /App/
+RUN dotnet publish "/App/worker/worker.csproj" -o /Out
+
+WORKDIR /Out
+RUN dotnet dev-certs https -ep ./aspnetapp.pfx -p wyrmxqcwxrQUNfekEHFYFFrwNYnCLw
+
+
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /App/
+COPY --from=build /Out .
+
+ENV API_URL=${API_URL}
+ENV VALKEY_IP=${VALKEY_IP}
+ENV VALKEY_PASSWORD=${VALKEY_PASSWORD}
+ENV SQLConnectionString=${SQLConnectionString}
+
+EXPOSE 1313
+EXPOSE 1331
+ENTRYPOINT ["dotnet", "worker.dll"]
