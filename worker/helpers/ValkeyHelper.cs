@@ -51,13 +51,15 @@ public static class ValkeyHelper
                 {
                     foreach (var exchange in exchanges)
                     {
-                        await client.AppendAsync(exchange.Name, JsonSerializer.Serialize(exchange));
+                         await client.SetAsync(new ValkeyKey(exchange.Type), new ValkeyValue(JsonSerializer.Serialize(exchange)));
                     }
                 }
                 else
                 {
                     Console.WriteLine($"[E] {DateTime.Now.ToUniversalTime} - Valkey ping response has failed, the data publishment has been skipped.");
                 }
+                
+                result = await client.GetAsync(new ValkeyKey(exchanges.First().Type));
             }
             else
             {

@@ -11,6 +11,8 @@ services:
       CONNECTION_STRING : ${POSTGRESQL_CONNECTION_STRING}
       API_URL : ${API_URL}
       HISTORIC_USD_API_URL : ${HISTORICAL_API_URL}
+      VALKEY_IP : ${VALKEY_IP}
+      VALKEY_PASSWORD : ${VALKEY_PASSWORD}
 
   database:
     image: postgres:18
@@ -45,31 +47,6 @@ services:
       dockerfile: ./frontend/dockerfile
     ports:
       ["80:80","433:433"]
-
-  elasticsearch:
-    container_name: ElasticSeach
-    hostname: elastic1
-    image: docker.elastic.co/elasticsearch/elasticsearch-wolfi:${ES_VERSION}
-    restart: unless-stopped
-    expose:
-      - 9234
-    mem_limit: 1g
-    environment:
-      - cluster.name=Elastic1
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xlog:disable -Xlog:all=warning:stderr:utctime,level,tags -Xlog:gc=debug:stderr:utctime
-      - xpack.security.enabled=false
-
-  kibana:
-    container_name: KibanaDolar
-    hostname: kibana
-    image: docker.elastic.co/kibana/kibana-wolfi:${ES_VERSION}
-    ports:
-      - 9235:5601
-    mem_limit: 1g
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elastic1:9200
-      - TELEMETRY_OPTIN=false
 
   valkey:
     container_name: valkey

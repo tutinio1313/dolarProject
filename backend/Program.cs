@@ -37,7 +37,8 @@ builder.Services.AddDbContext<ContainerDbContext>(
 
 
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IApiService, ApiService>();
+builder.Services.AddScoped<IValkeyService<Exchange>, ValkeyService>();
+builder.Services.AddScoped<IDolarService, DolarService>();
 builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 
 builder.Services.AddHttpsRedirection(options =>
@@ -50,7 +51,7 @@ builder.Services.AddHttpsRedirection(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-//builder.Services.AddLogging();
+builder.Services.AddLogging();
 
 
 builder.Logging.AddOpenTelemetry( options =>
@@ -81,14 +82,6 @@ if(!string.IsNullOrEmpty(builder.Configuration["GRAFANA_IP"]))
 
 var app = builder.Build();
 
-await ApplyMigration.Apply(app);
-await ApplyMigration.PopulateData(
-    builder.Configuration, 
-app.Services.CreateScope().ServiceProvider.GetRequiredService<IApiService>(),
-app.Services.CreateScope().ServiceProvider.GetRequiredService<ICurrencyRepository>()
-);
-
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -102,12 +95,7 @@ app.UseRouting();
 app.MapControllers();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-app.MapGet("/dolar", async (ICurrencyRepository repo, IApiService apiService) => await repo.GetLatest())
-.WithName("Dolar");
-
-app.MapGet("/ping", async () =>
-{
-    return "pong uwu kawaiiiiiiii";
-});
+app.MapGet("/dolar", async (IDolarService service) => await service.GetRecentData())
+.WithName("Dolar DB");
 
 app.Run();
